@@ -1,11 +1,12 @@
 {
-  "name": "uno",
+  "name": "een",
   "version": "1.0.0",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "repository": "https://github.com/Hyperclap-Studios/uno",
-  "author": "Daniel Leuthold",
+  "author": "Hyperclap Studios",
   "license": "MIT",
   "scripts": {
+    "start": "node dist/index.js",
     "dev": "nodemon --config nodemon.json src/index.ts",
     "dev:debug": "nodemon --config nodemon.json --inspect-brk src/index.ts"
   },
