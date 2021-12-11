@@ -1,5 +1,5 @@
 type CardColor = 'red' | 'green' | 'blue' | 'yellow' | 'black';
-type CardValue = number | '+2' | '+4' | 'reverse' | 'skip' | 'pickColor';
+type CardValue = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '+2' | '+4' | 'reverse' | 'skip' | 'pickColor';
 type CardState = 'deck' | 'played';
 
 class Card {
@@ -11,6 +11,11 @@ class Card {
         this.color = color;
         this.value = value;
         this.state = state;
+    }
+
+    public randomize(): void {
+        this.color = Card.randomColor();
+        this.value = Card.randomValue();
     }
 
     public canFollow(precedingCard: Card): boolean {
@@ -31,6 +36,16 @@ class Card {
             return true;
         }
         return false;
+    }
+
+    private static randomValue(): CardValue {
+        const values: CardValue[] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+2', '+4', 'reverse', 'skip', 'pickColor'];
+        return values[Math.floor(Math.random() * values.length)];
+    }
+
+    private static randomColor(): CardColor {
+        const colors: CardColor[] = ['red', 'green', 'blue', 'yellow', 'black'];
+        return colors[Math.floor(Math.random() * colors.length)];
     }
 }
 
