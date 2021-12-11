@@ -11,6 +11,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: $c-bg;
   color: $c-text;
+  font-size: 20px;
 }
 
 code {
@@ -22,4 +23,84 @@ code {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+h1 {
+  margin-bottom: 4rem;
+}
+
+h3 {
+  margin-bottom: 2rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  label {
+    margin-bottom: 2rem;
+  }
+
+  button {
+    width: 100%;
+  }
+}
+
+input {
+  outline: none;
+  border: none;
+  border-bottom: 1px solid $c-border;
+  font-size: inherit;
+  font-family: inherit;
+  background: none;
+  padding: .5rem 0 .5rem 0;
+  color: inherit;
+}
+
+label {
+  position: relative;
+
+  &:focus-within {
+    span {
+      font-size: .75rem;
+      transform: translateY(-75%);
+    }
+  }
+
+  span.focus {
+    font-size: .75rem;
+    transform: translateY(-75%);
+  }
+
+  span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateY(50%);
+    color: #aaa;
+    transition: all $--tms ease-in-out;
+  }
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  outline: none;
+  color: inherit;
+  border-radius: .5rem;
+  padding: .5rem 1rem;
+  border: 2px solid $c-border;
+  transition: all $--tms ease-in-out;
+
+  &:hover {
+    background-color: $c-pri;
+    cursor: pointer;
+  }
+}
+
+a {
+  text-decoration: none;
+  color: #aaa;
 }

@@ -2,34 +2,35 @@
 type CardColor = 'red' | 'green' | 'blue' | 'yellow' | 'black' | 'none';
 type CardValue = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '+2' | '+4' | 'reverse' | 'skip' | 'pickColor' | 'none';
 
-interface Card {
+interface ICard {
     color: CardColor,
     value: CardValue,
 }
 
-interface GamePlayer {
+interface IGamePlayer {
     name: string,
     hasTurn: boolean,
 }
 
-interface Player {
+interface IPlayer {
     uuid: string,
     name: '',
-    deck: Array<Card>,
+    deck: Array<ICard>,
 }
 
-interface Lobby {
+interface ILobby {
     id: number,
     name: string,
-    players: Array<GamePlayer>,
+    players: Array<IGamePlayer>,
+    playerLimit: number,
 }
 
 type GameState = 'waiting' | 'playing' | 'finished';
 
-interface Game extends Lobby {
-    stack: Array<Card>,
-    reserve: Array<Card>,
+interface IGame extends ILobby {
+    stack: Array<ICard>,
+    reserve: Array<ICard>,
     state: GameState,
 }
 
-export type { Player, Lobby, Card, CardValue, CardColor, GameState, Game };
+export type { IPlayer, ILobby, ICard, CardValue, CardColor, GameState, IGame };

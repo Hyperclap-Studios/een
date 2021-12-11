@@ -1,5 +1,5 @@
 import {atom} from 'recoil';
-import {Lobby, Player, Card} from './types';
+import {ILobby, IPlayer, ICard} from './types';
 import {Socket} from 'socket.io-client';
 
 const socketState = atom<Socket | null>({
@@ -12,23 +12,28 @@ const screenState = atom<'' | JSX.Element>({
     default: '',
 });
 
-const modalState = atom<'' | JSX.Element>({
-    key: 'modalState',
+const modalContentState = atom<string | JSX.Element>({
+    key: 'modalContentState',
     default: '',
 });
 
-const lobbiesState = atom<Array<Lobby>>({
-    key: 'lobbiesState',
-    default: new Array<Lobby>(),
+const modalOpenState = atom<boolean>({
+    key: 'modalOpenState',
+    default: false,
 });
 
-const playerState = atom<Player>({
+const lobbiesState = atom<Array<ILobby>>({
+    key: 'lobbiesState',
+    default: new Array<ILobby>(),
+});
+
+const playerState = atom<IPlayer>({
     key: 'playerState',
     default: {
         uuid: '',
         name: '',
-        deck: new Array<Card>(),
+        deck: new Array<ICard>(),
     },
 });
 
-export {screenState};
+export {socketState, playerState, lobbiesState, modalContentState, modalOpenState, screenState};

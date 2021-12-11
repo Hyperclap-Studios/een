@@ -3,7 +3,7 @@ import {MdBlock, MdFlipCameraAndroid} from "react-icons/md";
 import React from "react";
 import './Card.scss';
 
-interface CardProps {
+interface ICardProps {
     color: CardColor;
     value: CardValue;
 }
@@ -15,7 +15,7 @@ const cardSegments = <>
     <div className={'card_segment br'}/>
 </>;
 
-export default function Card({color, value}: CardProps) {
+export default function Card({color, value}: ICardProps) {
     const getRenderedValue = () => {
         switch (value) {
             case 'reverse':

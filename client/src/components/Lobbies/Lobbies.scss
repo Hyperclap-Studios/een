@@ -1,0 +1,41 @@
+@import '../../vars';
+
+.lobbies {
+  width: 100%;
+  max-width: $mw-container;
+
+  &_list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-start;
+  }
+}
+
+.lobby {
+  color: $c-text;
+  display: flex;
+  border: 2px solid $c-lobby-border;
+  border-radius: $br-lobby;
+  padding: 2rem 2rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  justify-content: space-between;
+  transition: background-color $--tms ease-in-out, border-color $--tms;
+
+  &.new {
+    font-weight: 800;
+    margin-bottom: 4rem;
+  }
+
+  &_name {
+    margin-right: 2rem;
+  }
+
+  &:hover {
+    background-color: $c-pri;
+    border-color: $c-pri;
+    cursor: pointer;
+  }
+}

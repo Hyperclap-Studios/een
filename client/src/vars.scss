@@ -4,22 +4,35 @@ $c-bg: #000;
 $c-text: #f0f0f0;
 
 
-$c-pri: #b99714;
+$c-pri: #987f16;
 
 $c-red: #e74c3c;
 $c-blue: #3498db;
 $c-green: #2ecc71;
 $c-yellow: #f1c40f;
 $c-black: #000;
+$c-border: #333;
 
-$c-card-border: #333;
+$c-modal-bg: #111;
+
+$c-lobby-border: $c-border;
+
+$c-card-border: $c-border;
 
 $w-card: 8rem;
 $h-card: $w-card * (8 / 5);
 
 $fs-card: 4rem;
 
+$br-modal: .5rem;
+$br-lobby: .5rem;
 $br-card: .5rem;
 
 $outline-strength: 3px;
 $ts-outline: -$outline-strength -1px 0 #000, $outline-strength -1px 0 #000, -$outline-strength 1px 0 #000, $outline-strength 1px 0 #000;
+
+$mw-container: 80ch;
+
+$--tms: 100ms;
+
+$z-modal: 1000;
