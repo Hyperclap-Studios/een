@@ -1,13 +1,25 @@
 import { config } from 'dotenv';
-import { Lobbies } from './classes/lobbies';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import http from 'http';
+import express from 'express';
+import { Server, Socket } from 'socket.io';
 
 config(); // Init Environment Variables from .env file
 
-const lobbies = new Lobbies();
+const PORT = process.env.PORT || 8080;
 
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
-(async () => {
-    const lobby = await lobbies.addLobby('wow');
+app.use(cors());
+app.use(bodyParser.json());
 
-    console.log(lobbies.getLobbyById(lobby.id));
-})();
+io.on('connection', (socket: Socket) => {
+    socket.send('Hello World');
+})
+
+server.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}.`);
+});

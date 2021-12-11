@@ -5,10 +5,12 @@ type GameState = 'waiting' | 'playing' | 'finished';
 class GamePlayer {
     public uuid: string;
     public deck: Array<Card>;
+    public hasTurn: boolean;
 
     constructor(uuid: string) {
         this.uuid = uuid;
         this.deck = new Array<Card>();
+        this.hasTurn = false;
     }
 
     public fillDeck(amount: number) {
@@ -26,18 +28,21 @@ class Game {
     public state: GameState;
     public stack: Array<Card>;
     public reserve: Array<Card>;
+    public streak: number;
 
     constructor() {
         this.players = new Array<GamePlayer>()
         this.state = 'waiting';
         this.stack = [Game.getRandomCard()];
         this.reserve = Game.getReserve(100);
+        this.streak = 0;
     }
 
     public reset() {
         this.state = 'waiting';
         this.stack = [Game.getRandomCard()];
         this.reserve = Game.getReserve(100);
+        this.streak = 0;
     }
 
     public addPlayer(uuid: string): GamePlayer {
