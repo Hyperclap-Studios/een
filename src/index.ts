@@ -11,14 +11,16 @@ config(); // Init Environment Variables from .env file
 const PORT = process.env.PORT || 8080;
 
 const app = express();
+app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server);
 
 app.use('/', express.static(join(__dirname, '..', 'client', 'build')))
-app.use(cors());
+
 app.use(bodyParser.json());
 
 io.on('connection', (socket: Socket) => {
+    console.log(`A new client connected.`);
     socket.send('Hello World');
 })
 
