@@ -1,0 +1,99 @@
+@import '../../vars';
+
+.card {
+  width: $w-card;
+  height: $h-card;
+
+  border: 2px solid $c-card-border;
+  border-radius: $br-card;
+
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: $fs-card;
+  font-weight: 600;
+  //text-shadow: $ts-outline;
+  -webkit-text-stroke: 2px #000000;
+
+  svg {
+    stroke: #000;
+    stroke-width: 1px;
+
+    path[fill="none"] {
+      stroke: none;
+    }
+  }
+
+  &.blue {
+    background-color: $c-blue;
+  }
+
+  &.green {
+    background-color: $c-green;
+  }
+
+  &.red {
+    background-color: $c-red;
+  }
+
+  &.yellow {
+    background-color: $c-yellow;
+  }
+
+  &.black {
+    background-color: $c-black;
+  }
+
+  &.none {
+    background-color: $c-card-border;
+  }
+
+  &_value {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &_segment {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+
+    &.tl {
+      top: 0;
+      left: 0;
+      background-color: $c-red;
+      border-top-left-radius: $br-card;
+    }
+
+    &.tr {
+      top: 0;
+      right: 0;
+      background-color: $c-blue;
+      border-top-right-radius: $br-card;
+    }
+
+    &.bl {
+      bottom: 0;
+      left: 0;
+      background-color: $c-yellow;
+      border-bottom-left-radius: $br-card;
+    }
+
+    &.br {
+      bottom: 0;
+      right: 0;
+      background-color: $c-green;
+      border-bottom-right-radius: $br-card;
+    }
+  }
+}

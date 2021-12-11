@@ -1,0 +1,25 @@
+
+
+$c-bg: #000;
+$c-text: #f0f0f0;
+
+
+$c-pri: #b99714;
+
+$c-red: #e74c3c;
+$c-blue: #3498db;
+$c-green: #2ecc71;
+$c-yellow: #f1c40f;
+$c-black: #000;
+
+$c-card-border: #333;
+
+$w-card: 8rem;
+$h-card: $w-card * (8 / 5);
+
+$fs-card: 4rem;
+
+$br-card: .5rem;
+
+$outline-strength: 3px;
+$ts-outline: -$outline-strength -1px 0 #000, $outline-strength -1px 0 #000, -$outline-strength 1px 0 #000, $outline-strength 1px 0 #000;
