@@ -2,12 +2,19 @@ import { Card } from './Card';
 
 type GameState = 'waiting' | 'playing' | 'finished';
 
+interface IClientGamePlayer {
+    name: string,
+    hasTurn: boolean,
+}
+
 class GamePlayer {
+    public name: string;
     public uuid: string;
     public deck: Array<Card>;
     public hasTurn: boolean;
 
-    constructor(uuid: string) {
+    constructor(name: string, uuid: string) {
+        this.name = name;
         this.uuid = uuid;
         this.deck = new Array<Card>();
         this.hasTurn = false;
@@ -33,20 +40,20 @@ class Game {
     constructor() {
         this.players = new Array<GamePlayer>()
         this.state = 'waiting';
-        this.stack = [Game.getRandomCard()];
+        this.stack = [Game.getRandomCard(false)];
         this.reserve = Game.getReserve(100);
         this.streak = 0;
     }
 
     public reset() {
         this.state = 'waiting';
-        this.stack = [Game.getRandomCard()];
+        this.stack = [Game.getRandomCard(false)];
         this.reserve = Game.getReserve(100);
         this.streak = 0;
     }
 
-    public addPlayer(uuid: string): GamePlayer {
-        const player = new GamePlayer(uuid);
+    public addPlayer(name: string, uuid: string): GamePlayer {
+        const player = new GamePlayer(name, uuid);
         this.players.push(player);
         return player;
     }
@@ -60,21 +67,28 @@ class Game {
         return false;
     }
 
+    public getClientPlayers(): Array<IClientGamePlayer> {
+        return this.players.map(p => {
+            return {
+                name: p.name,
+                hasTurn: p.hasTurn,
+            }
+        });
+    }
+
     private static getReserve(amount: number) {
         const cards = new Array<Card>();
         for (let i = 0; i < amount; i++) {
-            const card = new Card();
-            card.randomize();
-            cards.push(card);
+            cards.push(Game.getRandomCard());
         }
         return cards;
     }
 
-    private static getRandomCard(): Card {
+    private static getRandomCard(allowBlack = true): Card {
         const card = new Card();
-        card.randomize();
+        card.randomize(allowBlack);
         return card;
     }
 }
 
-export { GamePlayer, Game };
+export { GamePlayer, Game, IClientGamePlayer };

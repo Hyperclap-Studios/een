@@ -1,5 +1,12 @@
-import { hash } from 'bcrypt';
-import {Game} from "./Game";
+import {hash} from 'bcrypt';
+import {IClientGamePlayer, Game} from "./Game";
+
+interface IClientLobby {
+    id: number,
+    name: string,
+    players: Array<IClientGamePlayer>,
+    playerLimit: number,
+}
 
 class Lobby extends Game {
     public name: string;
@@ -28,9 +35,11 @@ class Lobbies {
     }
 
     public async addLobby(name: string, password: string = '', playerLimit: number = 8, id?: number): Promise<Lobby> {
+        console.log(this.lobbies);
+        console.log(this.lobbyCount);
         const lobby = new Lobby(
             name,
-            id ? id : this.lobbyCount > 0 ? (this.lobbies[this.lobbyCount].id ?? - 1) + 1 : 0,
+            id ? id : this.lobbyCount > 0 ? (this.lobbies[this.lobbies.length - 1].id ?? -1) + 1 : 0,
             await hash(password, 8),
             playerLimit,
         );
@@ -53,6 +62,17 @@ class Lobbies {
         const lobby = this.lobbies.find(lobby => lobby.id === id);
         return lobby ? lobby : null;
     }
+
+    public getClientLobbies(): Array<IClientLobby> {
+        return this.lobbies.map(lobby => {
+            return {
+                id: lobby.id,
+                name: lobby.name,
+                players: lobby.getClientPlayers(),
+                playerLimit: lobby.playerLimit,
+            }
+        });
+    }
 }
 
-export { Lobbies, Lobby };
+export {Lobbies, Lobby};

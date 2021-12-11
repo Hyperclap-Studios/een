@@ -13,9 +13,9 @@ class Card {
         this.state = state;
     }
 
-    public randomize(): void {
-        this.color = Card.randomColor();
-        this.value = Card.randomValue();
+    public randomize(allowBlack = true): void {
+        this.color = Card.randomColor(allowBlack);
+        this.value = Card.randomValue(this.color);
     }
 
     public canFollow(precedingCard: Card): boolean {
@@ -38,14 +38,17 @@ class Card {
         return false;
     }
 
-    private static randomValue(): CardValue {
-        const values: CardValue[] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+2', '+4', 'reverse', 'skip', 'pickColor'];
-        return values[Math.floor(Math.random() * values.length)];
+    private static randomValue(color: CardColor): CardValue {
+        const valuesBasic: Array<CardValue> = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+2', 'reverse', 'skip'];
+        const valuesBlack: Array<CardValue> = ['+4', 'pickColor'];
+        if (color === 'black') return valuesBlack[Math.floor(Math.random() * valuesBlack.length)];
+        else return valuesBasic[Math.floor(Math.random() * valuesBasic.length)];
     }
 
-    private static randomColor(): CardColor {
-        const colors: CardColor[] = ['red', 'green', 'blue', 'yellow', 'black'];
-        return colors[Math.floor(Math.random() * colors.length)];
+    private static randomColor(allowBlack = true): CardColor {
+        const colors: CardColor[] = ['red', 'green', 'blue', 'yellow'];
+        const BLACK_CHANCE = allowBlack ? 0.1 : 0;
+        return Math.random() < BLACK_CHANCE ? 'black' : colors[Math.floor(Math.random() * colors.length)];
     }
 }
 
