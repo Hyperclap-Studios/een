@@ -1,6 +1,11 @@
 import {atom} from 'recoil';
-import {ILobby, IPlayer, ICard} from './types';
+import {ILobby, IPlayer, ICard, IModalState} from './types';
 import {Socket} from 'socket.io-client';
+
+const tokenState = atom<string | null>({
+    key: 'tokenState',
+    default: localStorage.getItem('token'),
+});
 
 const socketState = atom<Socket | null>({
   key: 'socketState',
@@ -12,14 +17,13 @@ const screenState = atom<'' | JSX.Element>({
     default: '',
 });
 
-const modalContentState = atom<string | JSX.Element>({
-    key: 'modalContentState',
-    default: '',
-});
-
-const modalOpenState = atom<boolean>({
-    key: 'modalOpenState',
-    default: false,
+const modalState = atom<IModalState>({
+    key: 'modalState',
+    default: {
+        isOpen: false,
+        content: '',
+        closable: true,
+    },
 });
 
 const lobbiesState = atom<Array<ILobby>>({
@@ -36,4 +40,4 @@ const playerState = atom<IPlayer>({
     },
 });
 
-export {socketState, playerState, lobbiesState, modalContentState, modalOpenState, screenState};
+export {tokenState, socketState, playerState, lobbiesState, modalState, screenState};

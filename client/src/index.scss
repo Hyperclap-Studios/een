@@ -38,7 +38,12 @@ form {
   flex-direction: column;
   align-items: flex-start;
 
+  input {
+    width: 100%;
+  }
+
   label {
+    width: 100%;
     margin-bottom: 2rem;
   }
 
@@ -56,6 +61,12 @@ input {
   background: none;
   padding: .5rem 0 .5rem 0;
   color: inherit;
+  transition: border-color $--tms ease-in-out;
+
+
+  &:focus {
+    border-color: $c-pri;
+  }
 }
 
 label {
@@ -94,8 +105,9 @@ button {
   border: 2px solid $c-border;
   transition: all $--tms ease-in-out;
 
-  &:hover {
+  &:hover, &:focus {
     background-color: $c-pri;
+    border-color: $c-pri;
     cursor: pointer;
   }
 }

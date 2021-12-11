@@ -1,19 +1,32 @@
-import {useRecoilValue, useSetRecoilState} from "recoil";
-import {lobbiesState, modalContentState, modalOpenState} from "../../atoms";
+import {useRecoilState, useRecoilValue} from "recoil";
+import {lobbiesState, modalState} from "../../atoms";
 import {ILobby} from "../../types";
-import React, {useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import axios from 'axios';
 import './Lobbies.scss';
 
 export default function Lobbies() {
     const lobbies = useRecoilValue(lobbiesState);
-    const setModalContent = useSetRecoilState(modalContentState);
-    const setModalOpen = useSetRecoilState(modalOpenState);
+    const [modal, setModal] = useRecoilState(modalState);
 
     const openModal = () => {
-        setModalContent(<CreateLobby />);
-        setModalOpen(true);
+        setModal({
+            isOpen: true,
+            content: <CreateLobby />,
+            closable: true,
+        });
     };
+
+    const closeModal = useCallback(() => {
+        setModal({
+            ...modal,
+            isOpen: false,
+        });
+    }, [modal]);
+
+    useEffect(() => {
+        closeModal();
+    }, []);
 
     return (
         <div className={'lobbies'}>
@@ -50,7 +63,7 @@ function Lobby({lobby}: ILobbyProps) {
 function CreateLobby() {
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
-    const setModalOpen = useSetRecoilState(modalOpenState);
+    const [modal, setModal] = useRecoilState(modalState);
 
     const createLobby = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -58,17 +71,32 @@ function CreateLobby() {
             const response = await axios.post('/api/lobbies', {
                 name,
                 password,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                }
             });
             if (response.data.success) {
                 console.log(response.data);
                 setName('');
                 setPassword('');
-                setModalOpen(false);
+                setModal({
+                    ...modal,
+                    isOpen: false,
+                });
             }
         } catch (e: any) {
             console.error(e.message);
         }
     };
+
+    const inputElement = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (inputElement !== null && modal.isOpen) {
+            inputElement.current?.focus();
+        }
+    }, [modal.isOpen]);
 
     return (
         <>
@@ -76,7 +104,7 @@ function CreateLobby() {
             <form>
                 <label>
                     <span className={name === '' ? '' : 'focus'}>Name</span>
-                    <input value={name} onChange={e => setName(e.target.value)} type={'text'} />
+                    <input ref={inputElement} value={name} onChange={e => setName(e.target.value)} type={'text'} />
                 </label>
                 <label>
                     <span className={password === '' ? '' : 'focus'}>Password</span>

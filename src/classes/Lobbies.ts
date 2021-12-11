@@ -1,11 +1,14 @@
-import {hash} from 'bcrypt';
+import {hash, compare} from 'bcrypt';
 import {IClientGamePlayer, Game} from "./Game";
+import {Card} from "./Card";
 
 interface IClientLobby {
     id: number,
     name: string,
+    hasPassword: boolean,
     players: Array<IClientGamePlayer>,
     playerLimit: number,
+    stack: Array<Card>,
 }
 
 class Lobby extends Game {
@@ -22,6 +25,22 @@ class Lobby extends Game {
         this.password = password;
         this.playerLimit = playerLimit;
         this.timeCreated = Date.now();
+    }
+
+    public async checkPassword(password: string): Promise<boolean> {
+        if (this.password === '') return true;
+        return await compare(password, this.password);
+    }
+
+    public getClientLobby(): IClientLobby {
+        return {
+            id: this.id,
+            name: this.name,
+            hasPassword: this.password !== '',
+            players: this.getClientPlayers(),
+            playerLimit: this.playerLimit,
+            stack: this.stack,
+        }
     }
 }
 
@@ -40,7 +59,7 @@ class Lobbies {
         const lobby = new Lobby(
             name,
             id ? id : this.lobbyCount > 0 ? (this.lobbies[this.lobbies.length - 1].id ?? -1) + 1 : 0,
-            await hash(password, 8),
+            password === '' ? '' : await hash(password, 8),
             playerLimit,
         );
         this.lobbies.push(lobby);
@@ -65,13 +84,19 @@ class Lobbies {
 
     public getClientLobbies(): Array<IClientLobby> {
         return this.lobbies.map(lobby => {
-            return {
-                id: lobby.id,
-                name: lobby.name,
-                players: lobby.getClientPlayers(),
-                playerLimit: lobby.playerLimit,
+            return lobby.getClientLobby();
+        });
+    }
+
+    public checkLifecycle(): boolean {
+        let deletedLobbies = false;
+        this.lobbies.forEach(lobby => {
+            if (lobby.players.length === 0 && lobby.timeCreated + (10 * 1000) < Date.now()) {
+                deletedLobbies = true;
+                this.removeLobby(lobby.id);
             }
         });
+        return deletedLobbies;
     }
 }
 

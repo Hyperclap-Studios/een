@@ -1,19 +1,23 @@
 import './Modal.scss';
 import {useRecoilState, useRecoilValue} from "recoil";
-import {modalContentState, modalOpenState} from "../../atoms";
+import {modalState} from "../../atoms";
 
 export default function Modal() {
-    const content = useRecoilValue(modalContentState);
-    const [open, setOpen] = useRecoilState(modalOpenState);
+    const [modal, setModal] = useRecoilState(modalState);
 
     const closeModal = () => {
-        setOpen(false);
+        if (modal.closable) {
+            setModal({
+                ...modal,
+                isOpen: false,
+            });
+        }
     };
 
     return (
-        <div onClick={closeModal} className={`modal ${open ? 'open' : ''}`}>
+        <div onClick={closeModal} className={`modal ${modal.isOpen ? 'open' : ''}`}>
             <div onClick={e => e.stopPropagation()} className={'modal_content'}>
-                {content}
+                {modal.content}
             </div>
         </div>
     );

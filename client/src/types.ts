@@ -1,10 +1,12 @@
 
 type CardColor = 'red' | 'green' | 'blue' | 'yellow' | 'black' | 'none';
 type CardValue = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '+2' | '+4' | 'reverse' | 'skip' | 'pickColor' | 'none';
+type CardState = 'deck' | 'played';
 
 interface ICard {
     color: CardColor,
     value: CardValue,
+    state: CardState,
 }
 
 interface IGamePlayer {
@@ -21,8 +23,10 @@ interface IPlayer {
 interface ILobby {
     id: number,
     name: string,
+    hasPassword: boolean,
     players: Array<IGamePlayer>,
     playerLimit: number,
+    stack: Array<ICard>,
 }
 
 type GameState = 'waiting' | 'playing' | 'finished';
@@ -33,4 +37,10 @@ interface IGame extends ILobby {
     state: GameState,
 }
 
-export type { IPlayer, ILobby, ICard, CardValue, CardColor, GameState, IGame };
+interface IModalState {
+    isOpen: boolean,
+    content: string | JSX.Element,
+    closable: boolean,
+}
+
+export type { IPlayer, ILobby, ICard, CardValue, CardColor, GameState, IGame, IModalState };

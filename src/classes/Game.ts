@@ -67,6 +67,14 @@ class Game {
         return false;
     }
 
+    public getPlayer(uuid: string): GamePlayer | null {
+        return this.players.find(p => p.uuid === uuid) ?? null;
+    }
+
+    public playerExists(uuid: string): boolean {
+        return this.getPlayer(uuid) !== null;
+    }
+
     public getClientPlayers(): Array<IClientGamePlayer> {
         return this.players.map(p => {
             return {
