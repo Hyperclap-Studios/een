@@ -22,13 +22,15 @@ class Card {
         return this.canFollow(precedingCard) && this.state === 'deck';
     }
 
-    public play(precedingCard: Card, wishColor?: CardColor): void {
+    public play(precedingCard: Card, wishColor?: CardColor): boolean {
         if (this.canPlay(precedingCard)) {
             this.state = 'played';
             if (this.color === 'black' && wishColor) {
                 this.color = wishColor;
             }
+            return true;
         }
+        return false;
     }
 }
 
