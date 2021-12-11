@@ -1,43 +1,20 @@
 import { hash } from 'bcrypt';
+import {Game} from "./Game";
 
-interface LobbyPlayer {
-    uuid: string,
-    score: number,
-}
-
-class Lobby {
+class Lobby extends Game {
     public name: string;
     public id: number;
     public password: string;
     public playerLimit: number;
     public timeCreated: number;
-    public players: Array<LobbyPlayer>;
 
     constructor(name: string, id: number, password: string = '', playerLimit: number = 8) {
+        super();
         this.name = name;
         this.id = id;
         this.password = password;
         this.playerLimit = playerLimit;
         this.timeCreated = Date.now();
-        this.players = new Array<LobbyPlayer>();
-    }
-
-    public addPlayer(uuid: string): LobbyPlayer {
-        const player = {
-            uuid,
-            score: 0,
-        };
-        this.players.push(player);
-        return player;
-    }
-
-    public removePlayer(uuid: string): boolean {
-        const player = this.players.find(p => p.uuid === uuid);
-        if (player) {
-            this.players.splice(this.players.indexOf(player), 1);
-            return true;
-        }
-        return false;
     }
 }
 
