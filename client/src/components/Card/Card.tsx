@@ -33,6 +33,7 @@ export default function Card({draggable = true, index = 0, onDrop, onDragOver, c
                 return <>
                     {color === 'black' ? cardSegments : ''}
                 </>;
+            case '+16':
             case '+4':
                 return <>
                     {color === 'black' ? cardSegments : ''}

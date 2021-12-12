@@ -1,6 +1,6 @@
 
 type CardColor = 'red' | 'green' | 'blue' | 'yellow' | 'black' | 'none';
-type CardValue = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '+2' | '+4' | 'reverse' | 'skip' | 'pickColor' | 'none';
+type CardValue = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '+2' | '+4' | 'reverse' | 'skip' | 'pickColor' | '+16' | 'none';
 type CardState = 'deck' | 'played';
 
 interface ICard {

@@ -15,7 +15,7 @@ type CardValue =
     | 'reverse'
     | 'skip'
     | 'pickColor'
-    | '+100';
+    | '+16';
 type CardState = 'deck' | 'played';
 
 class Card {
@@ -73,7 +73,7 @@ class Card {
             case '+4':
                 numericalValue = 14;
                 break;
-            case '+100':
+            case '+16':
                 numericalValue = 15;
                 break;
             default:
@@ -106,8 +106,8 @@ class Card {
 
     private static randomValue(color: CardColor): CardValue {
         const valuesBasic: Array<CardValue> = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+2', 'reverse', 'skip'];
-        const valuesBlack: Array<CardValue> = ['+4', 'pickColor', '+100'];
-        if (color === 'black') return valuesBlack[Math.floor(Math.random() * valuesBlack.length)];
+        const valuesBlack: Array<CardValue> = ['+4', 'pickColor'];
+        if (color === 'black') return Math.random() < 0.1 ? '+16' : valuesBlack[Math.floor(Math.random() * valuesBlack.length)];
         else return valuesBasic[Math.floor(Math.random() * valuesBasic.length)];
     }
 

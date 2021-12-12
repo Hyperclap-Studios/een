@@ -195,7 +195,7 @@ class Game {
             if (card.canFollow(this.stack[this.stack.length - 1])) {
                 if (card.color === 'black') card.color = chooseColor;
                 let offset = card.value === 'skip' ? (this.players.length <= 2 ? 0 : 2) : 1;
-                this.streak += card.value === '+2' ? 2 : card.value === '+4' ? 4 : card.value === '+100' ? 100 : 0;
+                this.streak += card.value === '+2' ? 2 : card.value === '+4' ? 4 : card.value === '+16' ? 16 : 0;
                 console.log(`--- STREAK - ${this.streak}`);
                 if (card.value === 'reverse') this.direction *= -1;
                 this.stack.push(card);
