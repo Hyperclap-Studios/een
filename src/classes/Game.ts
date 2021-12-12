@@ -78,7 +78,7 @@ class GamePlayer {
 
 class Game {
     public players: Array<GamePlayer>;
-    private playingPlayers: Array<GamePlayer>;
+    //private playingPlayers: Array<GamePlayer>;
     public state: GameState;
     public stack: Array<Card>;
     public reserve: Array<Card>;
@@ -95,7 +95,7 @@ class Game {
             ...config,
         };
         this.players = new Array<GamePlayer>()
-        this.playingPlayers = new Array<GamePlayer>()
+        //this.playingPlayers = new Array<GamePlayer>()
         this.state = 'waiting';
         this.stack = [Game.getRandomCard(false)];
         this.reserve = Game.getReserve(100);
@@ -128,13 +128,13 @@ class Game {
         if (player) {
             this.players.splice(this.players.indexOf(player), 1);
             if (this.state === 'playing') {
-                const hadTurn = player.hasTurn;
-                const playerIndex = this.playingPlayers.indexOf(player);
-                this.playingPlayers.splice(playerIndex, 1);
-                if (hadTurn) {
-                    this.lastIndex = this.direction === 1 ? (playerIndex >= this.playingPlayers.length ? 0 : playerIndex) : (playerIndex - 1 < 0 ? this.playingPlayers.length - 1 : playerIndex - 1);
-                    this.nextTurn(0);
-                }
+                //const hadTurn = player.hasTurn;
+                //const playerIndex = this.playingPlayers.indexOf(player);
+                // this.playingPlayers.splice(playerIndex, 1);
+                // if (hadTurn) {
+                //     this.lastIndex = this.direction === 1 ? (playerIndex >= this.playingPlayers.length ? 0 : playerIndex) : (playerIndex - 1 < 0 ? this.playingPlayers.length - 1 : playerIndex - 1);
+                //     this.nextTurn(0);
+                // }
             }
             return true;
         }
@@ -156,10 +156,10 @@ class Game {
     public nextTurn(offset = 1): GamePlayer | null {
         if (this.checkIsFinished()) return null;
         const nextIndex = (this.lastIndex + this.direction * offset);
-        const _nextIndex = offset === 0 ? this.lastIndex : (nextIndex <= 0 ? this.playingPlayers.length + nextIndex : nextIndex) % this.players.length;
-        const nextPlayer = this.playingPlayers[_nextIndex];
+        const _nextIndex = (nextIndex <= 0 ? this.players.length + nextIndex : nextIndex) % this.players.length;
+        const nextPlayer = this.players[_nextIndex];
         console.log(`LAST INDEX: ${this.lastIndex} - NEXT INDEX: ${_nextIndex}`);
-        this.playingPlayers[this.lastIndex].hasTurn = false;
+        this.players[this.lastIndex].hasTurn = false;
         //this.playingPlayers[this.lastIndex].pickedUpCard = false;
         nextPlayer.hasTurn = true;
         this.lastIndex = _nextIndex;
@@ -205,11 +205,11 @@ class Game {
                     player.sortDeck();
                 }
                 if (player.deck.length === 0) {
-                    const playerIndex = this.playingPlayers.indexOf(player);
-                    this.playingPlayers.splice(playerIndex, 1);
-                    this.lastIndex = this.direction === 1 ? (playerIndex >= this.playingPlayers.length ? 0 : playerIndex) : (playerIndex - 1 < 0 ? this.playingPlayers.length - 1 : playerIndex - 1);
+                    //const playerIndex = this.playingPlayers.indexOf(player);
+                    //this.playingPlayers.splice(playerIndex, 1);
+                    //this.lastIndex = this.direction === 1 ? (playerIndex >= this.playingPlayers.length ? 0 : playerIndex) : (playerIndex - 1 < 0 ? this.playingPlayers.length - 1 : playerIndex - 1);
                     console.log(this.lastIndex);
-                    offset = 0;
+                    //offset = 0;
                     player.place = this.places;
                     this.places++;
                 } else if (player.deck.length === 1) {
@@ -322,7 +322,7 @@ class Game {
             });
             this.lastIndex = Math.floor(Math.random() * this.players.length);
             this.players[this.lastIndex].hasTurn = true;
-            this.playingPlayers = [...this.players];
+            //this.playingPlayers = [...this.players];
             if (!this.canPlay(this.players[this.lastIndex].player.uuid)) {
                 this.nextTurn(0);
             }
