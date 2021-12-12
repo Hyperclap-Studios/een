@@ -13,11 +13,14 @@ interface IGamePlayer {
     name: string,
     hasTurn: boolean,
     isReady: boolean,
+    place: number | null,
+    deckSize: number,
 }
 
 interface IPlayer extends IGamePlayer {
     deck: Array<ICard>,
     inLobby: number | null,
+    pickedUpCard: boolean,
 }
 
 interface ILobby {
@@ -28,6 +31,8 @@ interface ILobby {
     playerLimit: number,
     stack: Array<ICard>,
     state: 'waiting' | 'playing' | 'finished',
+    streak: number,
+    direction: 1 | -1,
 }
 
 type GameState = 'waiting' | 'playing' | 'finished';

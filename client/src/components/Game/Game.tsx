@@ -1,5 +1,5 @@
 import './Game.scss';
-import {ILobby} from "../../types";
+import {CardColor, ILobby} from "../../types";
 import {useRecoilState, useRecoilValue} from "recoil";
 import {currentLobbyState, lobbyTokenState, modalState, playerState, tokenState} from "../../atoms";
 import {useEffect, useState, MouseEvent, useCallback, useRef} from "react";
@@ -7,6 +7,7 @@ import axios from "axios";
 import {Link} from 'react-router-dom';
 import socket from '../../socket';
 import Card from "../Card/Card";
+import {GiClockwiseRotation, GiAnticlockwiseRotation} from 'react-icons/gi';
 
 interface IGameProps {
     lobby: ILobby,
@@ -57,7 +58,7 @@ export default function Game({lobby}: IGameProps) {
                 localStorage.setItem('lobbyToken', '');
                 setModal({
                     isOpen: true,
-                    content: <PasswordPrompt joinGame={joinGame} />,
+                    content: <PasswordPrompt joinGame={joinGame}/>,
                     closable: false,
                 });
             }
@@ -74,7 +75,7 @@ export default function Game({lobby}: IGameProps) {
         } else {
             setModal({
                 isOpen: true,
-                content: <PasswordPrompt joinGame={joinGame} />,
+                content: <PasswordPrompt joinGame={joinGame}/>,
                 closable: false,
             })
         }
@@ -83,11 +84,11 @@ export default function Game({lobby}: IGameProps) {
     const getScreen = () => {
         switch (lobby.state) {
             case 'waiting':
-                return <WaitingScreen lobby={lobby} />;
+                return <WaitingScreen lobby={lobby}/>;
             case 'playing':
-                return <PlayingScreen lobby={lobby} />;
+                return <PlayingScreen lobby={lobby}/>;
             case 'finished':
-                return <FinishedScreen lobby={lobby} />;
+                return <FinishedScreen lobby={lobby}/>;
             default:
                 return <div>Unknown state</div>;
         }
@@ -118,7 +119,8 @@ function WaitingScreen({lobby}: IScreenProps) {
         <div className={'game'}>
             <h1 className={'game_name'}>{lobby.name}</h1>
             <span className={'game_playerCount'}>{lobby.players.length} / {lobby.playerLimit} Players</span>
-            <button tabIndex={-1} className={`game_readyButton ${player.isReady ? 'ready' : ''}`} onClick={toggleReady}>{player.isReady ? 'Unready' : 'Ready Up'}</button>
+            <button tabIndex={-1} className={`game_readyButton ${player.isReady ? 'ready' : ''}`}
+                    onClick={toggleReady}>{player.isReady ? 'Unready' : 'Ready Up'}</button>
             <div className={'game_players'}>
                 {
                     lobby.players.map((player, index) => (
@@ -135,26 +137,88 @@ function WaitingScreen({lobby}: IScreenProps) {
 
 function PlayingScreen({lobby}: IScreenProps) {
     const player = useRecoilValue(playerState);
+    const [modal, setModal] = useRecoilState(modalState);
 
     const topCard = lobby.stack[lobby.stack.length - 1];
+
+    const allowDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+    };
+
+    const drop = (e: React.DragEvent) => {
+        e.preventDefault();
+        const cardIndex = parseInt(e.dataTransfer.getData('index'));
+        console.log({
+            cardIndex
+        });
+        if (player.deck[cardIndex].color === 'black') {
+            setModal({
+                isOpen: true,
+                closable: true,
+                content: <ChooseColor lobbyId={lobby.id} cardIndex={cardIndex}/>
+            });
+        } else {
+            socket.emit('play_card', {
+                lobbyId: lobby.id,
+                cardIndex,
+                chooseColor: 'red',
+            });
+        }
+    };
+
+    const pickUpCard = () => {
+        socket.emit('pick_up_card', {
+            lobbyId: lobby.id,
+        });
+    };
+
+    const skip = () => {
+        socket.emit('skip', {
+            lobbyId: lobby.id,
+        });
+    };
 
     return (
         <div className={'playingScreen'}>
             {
                 lobby.players.map((_player, i) => (
-                    <div style={{
+                    <div key={i} style={{
                         top: `${Math.sin(i / (lobby.players.length - 1) * Math.PI + Math.PI) * 45 + 50}%`,
                         left: `${Math.cos(i / (lobby.players.length - 1) * Math.PI + Math.PI) * 45 + 50}%`,
-                    }} className={`playingScreen_player ${_player.hasTurn ? 'hasTurn' : ''} ${_player.name === player.name ? 'isPlayer' : ''}`}>{_player.name}</div>
+                    }}
+                         className={`playingScreen_player ${_player.hasTurn ? 'hasTurn' : ''} ${_player.name === player.name ? 'isPlayer' : ''}`}>
+                        <div className={'playingScreen_player_name'}>{_player.name}</div>
+                        <div
+                            className={'playingScreen_player_deckSize'}>{_player.place ? _player.place + '\' Place' : _player.deckSize + ' Cards'}</div>
+                    </div>
                 ))
             }
             <div className={'playingScreen_stack'}>
-                <Card value={topCard.value} color={topCard.color} />
+                <Card index={-1} draggable={false} onDragOver={allowDrop} onDrop={drop} value={topCard.value}
+                      color={topCard.color}/>
+            </div>
+            <div className={'playingScreen_info'}>
+                <div className={'playingScreen_info_streak'}>Current Streak: {lobby.streak}</div>
+                <div className={'playingScreen_info_direction'}>{lobby.direction === 1 ? <GiClockwiseRotation/> :
+                    <GiAnticlockwiseRotation/>}</div>
+                <div className={'playingScreen_info_turnState'}>{player.hasTurn ? 'Your Turn' : ''}</div>
+            </div>
+            <div className={'playingScreen_controls'}>
+                {
+                    player.hasTurn ? (
+                        <>
+                            {
+                                player.pickedUpCard ? '' : <button onClick={pickUpCard}>Pick Up Card</button>
+                            }
+                            <button onClick={skip}>Skip</button>
+                        </>
+                    ) : ''
+                }
             </div>
             <div className={'playingScreen_deck'}>
                 {
                     player.deck.map((card, i) => (
-                        <Card key={i} value={card.value} color={card.color} size={'small'} />
+                        <Card draggable={true} key={i} index={i} value={card.value} color={card.color} size={'small'}/>
                     ))
                 }
             </div>
@@ -162,10 +226,72 @@ function PlayingScreen({lobby}: IScreenProps) {
     );
 }
 
-function FinishedScreen({lobby}: IScreenProps) {
-    return (
-        <div>
+interface IChooseColorProps {
+    cardIndex: number,
+    lobbyId: number,
+}
 
+function ChooseColor({cardIndex, lobbyId}: IChooseColorProps) {
+    const [modal, setModal] = useRecoilState(modalState);
+
+    const choose = (color: CardColor) => {
+        socket.emit('play_card', {
+            lobbyId,
+            cardIndex,
+            chooseColor: color,
+        });
+        setModal({
+            ...modal,
+            isOpen: false,
+        });
+    };
+
+    return (
+        <>
+            <h3>Choose Color</h3>
+            <div className={'chooseColor'}>
+                <div className={'chooseColor_row'}>
+                    <div onClick={() => choose('red')} className={'chooseColor_tile red'}/>
+                    <div onClick={() => choose('blue')} className={'chooseColor_tile blue'}/>
+                </div>
+                <div className={'chooseColor_row'}>
+                    <div onClick={() => choose('yellow')} className={'chooseColor_tile yellow'}/>
+                    <div onClick={() => choose('green')} className={'chooseColor_tile green'}/>
+                </div>
+            </div>
+        </>
+    );
+}
+
+function FinishedScreen({lobby}: IScreenProps) {
+    useEffect(() => {
+        console.log(lobby);
+    }, [lobby]);
+
+    const getSortedPlayers = useCallback(() => {
+        const _players = [...lobby.players];
+        _players.sort((a, b) => {
+
+            if ((a.place ? a.place : 0) < (b.place ? b.place : lobby.players.length)) return -1;
+            if ((a.place ? a.place : 0) > (b.place ? b.place : lobby.players.length)) return 1;
+
+            return 0;
+        });
+        return _players;
+    }, [lobby]);
+
+    return (
+        <div className={'finishedScreen'}>
+            <h1>Finished</h1>
+            <div className={'finishedScreen_leaderboard'}>
+                {
+                    getSortedPlayers().map((_player, i) => (
+                        <div className={'finishedScreen_leaderboard_player'}>
+                            {_player.place}' Place: {_player.name}
+                        </div>
+                    ))
+                }
+            </div>
         </div>
     );
 }
@@ -205,7 +331,8 @@ function PasswordPrompt({joinGame}: IPasswordPromptProps) {
             <form>
                 <label>
                     <span className={password === '' ? '' : 'focus'}>Password</span>
-                    <input ref={inputRef} type={'password'} value={password} onChange={e => setPassword(e.target.value)} />
+                    <input ref={inputRef} type={'password'} value={password}
+                           onChange={e => setPassword(e.target.value)}/>
                 </label>
                 <button className={error ? 'marginBottom' : ''} onClick={_joinGame}>Enter</button>
                 <span className={'error'}>{error}</span>

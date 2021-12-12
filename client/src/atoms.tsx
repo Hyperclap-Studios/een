@@ -49,6 +49,9 @@ const playerState = atom<IPlayer>({
         hasTurn: false,
         inLobby: null,
         isReady: false,
+        deckSize: 0,
+        place: null,
+        pickedUpCard: false,
     },
 });
 

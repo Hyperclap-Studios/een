@@ -5,9 +5,10 @@ import http from 'http';
 import express from 'express';
 import {Server, Socket} from 'socket.io';
 import {join} from 'path';
-import {Lobbies} from './classes/Lobbies';
+import {Lobbies, Lobby} from './classes/Lobbies';
 import {JwtPayload, verify} from 'jsonwebtoken';
 import {Players} from "./classes/Players";
+import { GamePlayer } from './classes/Game';
 
 config(); // Init Environment Variables from .env file
 
@@ -53,6 +54,10 @@ io.use((socket, next) => {
         socket.data = payload;
         next();
     } else {
+        console.log('Authentication Error');
+        socket.emit('error', {
+            msg: 'Authentication Error'
+        });
         next(new Error('Authentication Error'));
     }
 })
@@ -95,8 +100,14 @@ io.on('connection', (socket: Socket) => {
         const player = lobby?.getPlayer(socket.data.uuid);
         if (player) {
             player.ready = !player.ready;
-            lobby?.tryStart();
-            io.to(player.player.socketId).emit('update_player', lobby?.getClientPlayer(socket.data.uuid));
+            const started = lobby?.tryStart();
+            if (started) {
+                lobby?.players.forEach(_player => {
+                    refreshPlayer(_player, lobby);
+                });
+            } else {
+                refreshPlayer(player, lobby);
+            }
         }
         refreshLobbies();
     });
@@ -106,18 +117,66 @@ io.on('connection', (socket: Socket) => {
         const lobby = lobbies.getLobbyById(payload.lobbyId);
         const player = lobby?.getPlayer(socket.data.uuid);
         if (player) {
-            io.to(player.player.socketId).emit('update_player', lobby?.getClientPlayer(socket.data.uuid));
+            refreshPlayer(player, lobby);
+        }
+    });
+
+    socket.on('play_card', (payload) => {
+        console.log(payload);
+        const lobby = lobbies.getLobbyById(payload.lobbyId);
+        const player = lobby?.getPlayer(socket.data.uuid);
+        if (lobby && player && lobby.tryMove(socket.data.uuid, payload.cardIndex, payload.chooseColor)) {
+            refreshLobbies();
+            refreshPlayers(lobby);
+            if (lobby.state === 'finished') {
+                setTimeout(() => {
+                    lobby.reset();
+                    refreshLobbies();
+                    refreshPlayers(lobby);
+                }, 3000);
+            }
+        }
+    });
+
+    socket.on('pick_up_card', (payload) => {
+        const lobby = lobbies.getLobbyById(payload.lobbyId);
+        const player = lobby?.getPlayer(socket.data.uuid);
+        if (lobby && player && lobby.tryPickUp(player)) {
+            refreshLobbies();
+            refreshPlayers(lobby);
+        }
+    });
+
+    socket.on('skip', (payload) => {
+        const lobby = lobbies.getLobbyById(payload.lobbyId);
+        const player = lobby?.getPlayer(socket.data.uuid);
+        if (lobby && player && lobby.trySkip(player)) {
+            refreshLobbies();
+            refreshPlayers(lobby);
         }
     });
 
     refreshLobbies();
 })
 
+const refreshPlayers = (lobby: Lobby | null) => {
+    if (lobby) {
+        lobby.players.forEach(_player => {
+            refreshPlayer(_player, lobby);
+        });
+    }
+};
+
+const refreshPlayer = (player: GamePlayer, lobby: Lobby | null) => {
+    if (lobby) io.to(player.player.socketId).emit('update_player', lobby.getClientPlayer(player.player.uuid));
+};
+
 const refreshLobbies = () => {
     io.emit('lobbies', lobbies.getClientLobbies())
 };
 
 app.post('/api/lobbies', authMiddleware, async (req, res) => {
+    console.log('POST /api/lobbies');
     const lobby = await lobbies.addLobby(req.body.name, req.body.password || '');
     res.json({
         success: true,
@@ -135,6 +194,7 @@ app.post('/api/lobbies', authMiddleware, async (req, res) => {
 });
 
 app.post('/api/login', (req, res) => {
+    console.log('POST /api/login');
     const player = players.addPlayer(req.body.name);
     res.json({
         success: true,
@@ -144,6 +204,7 @@ app.post('/api/login', (req, res) => {
 });
 
 app.get('/api/player', authMiddleware, (_req, res) => {
+    console.log('GET /api/player');
     const exists = players.existsPlayer(res.locals.user.uuid);
     const player = exists ? players.getPlayer(res.locals.user.uuid) : players.addPlayer(res.locals.user.name);
     res.json({
@@ -155,6 +216,7 @@ app.get('/api/player', authMiddleware, (_req, res) => {
 });
 
 app.post('/api/join/:id', authMiddleware, async (req, res) => {
+    console.log('POST /api/join/' + req.params.id);
     const lobby = lobbies.getLobbyById(parseInt(req.params.id));
     const player = players.getPlayer(res.locals.user.uuid);
     if (lobby && player && (lobby.validateJWT(req.body.lobbyToken) || await lobby.checkPassword(req.body.password))) {

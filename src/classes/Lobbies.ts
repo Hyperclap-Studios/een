@@ -13,6 +13,8 @@ interface IClientLobby {
     playerLimit: number,
     stack: Array<Card>,
     state: GameState,
+    streak: number,
+    direction: 1 | -1,
 }
 
 interface IClientPlayer extends IClientGamePlayer {
@@ -79,6 +81,8 @@ class Lobby extends Game {
             playerLimit: this.playerLimit,
             stack: this.stack,
             state: this.state,
+            streak: this.streak,
+            direction: this.direction,
         }
     }
 
@@ -96,6 +100,9 @@ class Lobby extends Game {
             deck: player.deck,
             inLobby: this.id,
             isReady: player.ready,
+            place: player.place,
+            deckSize: player.deck.length,
+            pickedUpCard: player.pickedUpCard,
         };
     }
 }

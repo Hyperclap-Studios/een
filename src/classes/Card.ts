@@ -1,5 +1,20 @@
 type CardColor = 'red' | 'green' | 'blue' | 'yellow' | 'black';
-type CardValue = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '+2' | '+4' | 'reverse' | 'skip' | 'pickColor';
+type CardValue =
+    '0'
+    | '1'
+    | '2'
+    | '3'
+    | '4'
+    | '5'
+    | '6'
+    | '7'
+    | '8'
+    | '9'
+    | '+2'
+    | '+4'
+    | 'reverse'
+    | 'skip'
+    | 'pickColor';
 type CardState = 'deck' | 'played';
 
 class Card {
@@ -38,6 +53,53 @@ class Card {
         return false;
     }
 
+    public getSortValue(): number {
+        let numericalValue;
+        // '+2' | '+4' | 'reverse' | 'skip' | 'pickColor'
+        switch (this.value) {
+            case '+2':
+                numericalValue = 10;
+                break;
+            case 'reverse':
+                numericalValue = 11;
+                break;
+            case 'skip':
+                numericalValue = 12;
+                break;
+            case 'pickColor':
+                numericalValue = 13;
+                break;
+            case '+4':
+                numericalValue = 14;
+                break;
+            default:
+                numericalValue = parseInt(this.value);
+        }
+
+        let bias = 0;
+        switch (this.color) {
+            case 'red':
+                bias = 0;
+                break;
+            case 'green':
+                bias = 100;
+                break;
+            case 'blue':
+                bias = 200;
+                break;
+            case 'yellow':
+                bias = 300;
+                break;
+            case 'black':
+                bias = 400;
+                break;
+            default:
+                bias = -100;
+                break;
+        }
+        return numericalValue + bias;
+    }
+
     private static randomValue(color: CardColor): CardValue {
         const valuesBasic: Array<CardValue> = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+2', 'reverse', 'skip'];
         const valuesBlack: Array<CardValue> = ['+4', 'pickColor'];
@@ -52,4 +114,4 @@ class Card {
     }
 }
 
-export { CardColor, CardValue, CardState, Card };
+export {CardColor, CardValue, CardState, Card};

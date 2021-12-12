@@ -4,9 +4,13 @@ import React from "react";
 import './Card.scss';
 
 interface ICardProps {
-    color: CardColor;
-    value: CardValue;
-    size?: CardSize;
+    onDrop?: React.DragEventHandler<HTMLDivElement>,
+    onDragOver?: React.DragEventHandler<HTMLDivElement>,
+    color: CardColor,
+    value: CardValue,
+    size?: CardSize,
+    index: number,
+    draggable: boolean,
 }
 
 type CardSize = 'small' | 'medium' | 'large';
@@ -18,7 +22,7 @@ const cardSegments = <>
     <div className={'card_segment br'}/>
 </>;
 
-export default function Card({color, value, size = 'medium'}: ICardProps) {
+export default function Card({draggable = true, index = 0, onDrop, onDragOver, color, value, size = 'medium'}: ICardProps) {
     const getRenderedValue = () => {
         switch (value) {
             case 'reverse':
@@ -27,11 +31,11 @@ export default function Card({color, value, size = 'medium'}: ICardProps) {
                 return <MdBlock />;
             case 'pickColor':
                 return <>
-                    {cardSegments}
+                    {color === 'black' ? cardSegments : ''}
                 </>;
             case '+4':
                 return <>
-                    {cardSegments}
+                    {color === 'black' ? cardSegments : ''}
                     <div className={'card_value'}>{value}</div>
                 </>;
             case 'none':
@@ -41,8 +45,12 @@ export default function Card({color, value, size = 'medium'}: ICardProps) {
         }
     };
 
+    const drag = (e: React.DragEvent) => {
+        e.dataTransfer.setData('index', index.toString());
+    };
+
     return (
-        <div className={`card ${color} ${size}`}>
+        <div draggable={draggable} onDragStart={drag} onDrop={onDrop} onDragOver={onDragOver} className={`card ${color} ${size}`}>
             {getRenderedValue()}
         </div>
     );

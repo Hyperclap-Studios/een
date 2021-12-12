@@ -78,6 +78,44 @@
 
     .card {
       margin: .25rem;
+      margin-right: -1rem;
+      margin-top: -2rem;
+    }
+  }
+
+  &_info {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    text-align: center;
+
+    &_direction {
+      margin-bottom: 1rem;
+    }
+
+    &_streak {
+      margin-bottom: 2rem;
+      font-size: 1.25rem;
+    }
+  }
+
+  &_controls {
+    position: fixed;
+    bottom: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    text-align: center;
+
+    button {
+      margin: 0 1rem;
+
+      &:not(:hover):focus {
+        border-color: $c-border;
+        background: none;
+      }
     }
   }
 
@@ -87,6 +125,14 @@
     border-radius: .5rem;
     border: 2px solid $c-border;
     padding: .5rem 1rem;
+    white-space: nowrap;
+
+    display: flex;
+    flex-direction: column;
+
+    &_name {
+      margin-bottom: .5rem;
+    }
 
     &.isPlayer {
       font-weight: 800;
@@ -95,6 +141,54 @@
     &.hasTurn {
       border-color: $c-pri;
       background-color: $c-pri;
+    }
+  }
+}
+
+.chooseColor {
+
+  width: 8rem;
+
+  &_row {
+    display: flex;
+  }
+
+  &_tile {
+    width: 50%;
+    height: 4rem;
+    transition: transform $--tms ease-in-out;
+
+    &.red {
+      background-color: $c-red;
+    }
+
+    &.blue {
+      background-color: $c-blue;
+    }
+
+    &.green {
+      background-color: $c-green;
+    }
+
+    &.yellow {
+      background-color: $c-yellow;
+    }
+
+    &:hover {
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+  }
+}
+
+.finishedScreen {
+  &_leaderboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &_player {
+      text-align: left;
     }
   }
 }

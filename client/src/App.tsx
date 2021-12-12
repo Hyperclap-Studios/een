@@ -54,8 +54,8 @@ function App() {
                         setLobbies(_lobbies);
                     });
 
-                    socket.off('connect_error').on('connect_error', (error) => {
-                        console.log('Connect Error');
+                    socket.off('error').on('error', (error) => {
+                        console.log(error.msg);
                     });
 
                     socket.off('player_ping').on('player_ping', (payload) => {
