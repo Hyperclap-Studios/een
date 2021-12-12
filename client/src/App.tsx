@@ -55,7 +55,7 @@ function App() {
                     });
 
                     socket.off('connect_error').on('connect_error', (error) => {
-                        console.log(error);
+                        console.log('Connect Error');
                     });
 
                     socket.off('player_ping').on('player_ping', (payload) => {
