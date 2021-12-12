@@ -1,13 +1,15 @@
-import {useRecoilState, useRecoilValue} from "recoil";
-import {lobbiesState, modalState} from "../../atoms";
+import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
+import {currentLobbyState, lobbiesState, lobbyTokenState, modalState} from "../../atoms";
 import {ILobby} from "../../types";
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import axios from 'axios';
 import './Lobbies.scss';
+import {useNavigate} from "react-router-dom";
 
 export default function Lobbies() {
     const lobbies = useRecoilValue(lobbiesState);
     const [modal, setModal] = useRecoilState(modalState);
+    const setCurrentLobby = useSetRecoilState(currentLobbyState);
 
     const openModal = () => {
         setModal({
@@ -26,6 +28,7 @@ export default function Lobbies() {
 
     useEffect(() => {
         closeModal();
+        setCurrentLobby(null);
     }, []);
 
     return (
@@ -36,7 +39,7 @@ export default function Lobbies() {
                     <div className={'lobby_name'}>Create New Lobby</div>
                 </div>
                 {
-                    lobbies.map((lobby: ILobby) => {
+                    lobbies?.map((lobby: ILobby) => {
                         return (
                             <Lobby key={lobby.id} lobby={lobby}/>
                         );
@@ -63,7 +66,10 @@ function Lobby({lobby}: ILobbyProps) {
 function CreateLobby() {
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
+    const setLobbyToken = useSetRecoilState(lobbyTokenState);
     const [modal, setModal] = useRecoilState(modalState);
+
+    const navigate = useNavigate();
 
     const createLobby = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -78,12 +84,15 @@ function CreateLobby() {
             });
             if (response.data.success) {
                 console.log(response.data);
+                setLobbyToken(response.data.lobbyToken);
+                localStorage.setItem('lobbyToken', response.data.lobbyToken);
                 setName('');
                 setPassword('');
                 setModal({
                     ...modal,
                     isOpen: false,
                 });
+                navigate(`/lobby/${response.data.lobby.id}`);
             }
         } catch (e: any) {
             console.error(e.message);

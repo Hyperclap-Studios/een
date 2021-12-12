@@ -1,2 +1,100 @@
 @import '../../vars';
 
+.leave {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: $z-leave-link;
+  color: #aaa;
+  transition: all $--tms ease-in-out;
+
+  &:hover {
+    color: $c-pri;
+  }
+}
+
+.game {
+  width: 100%;
+  max-width: $mw-container;
+  text-align: center;
+
+  &_name {
+    margin-bottom: 1rem;
+  }
+
+  &_readyButton {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+
+    &:not(.ready):not(:hover):focus {
+      border-color: $c-border;
+      background: none;
+    }
+  }
+
+  &_playerCount {
+    display: block;
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  &_players {
+    font-size: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  &_player {
+    display: flex;
+
+    border: 2px solid $c-border;
+    border-radius: $br-card;
+    padding: 1rem 2rem;
+    margin: 2rem;
+
+    &.ready {
+      border-color: $c-pri;
+      background-color: $c-pri;
+    }
+
+    &_icon {
+      margin-right: 2rem;
+    }
+  }
+}
+
+.playingScreen {
+
+  &_deck {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    left: 0;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 1rem 4rem;
+
+    .card {
+      margin: .25rem;
+    }
+  }
+
+  &_player {
+    position: fixed;
+    transform: translate(-50%, -50%);
+    border-radius: .5rem;
+    border: 2px solid $c-border;
+    padding: .5rem 1rem;
+
+    &.isPlayer {
+      font-weight: 800;
+    }
+
+    &.hasTurn {
+      border-color: $c-pri;
+      background-color: $c-pri;
+    }
+  }
+}

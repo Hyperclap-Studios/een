@@ -12,12 +12,12 @@ interface ICard {
 interface IGamePlayer {
     name: string,
     hasTurn: boolean,
+    isReady: boolean,
 }
 
-interface IPlayer {
-    uuid: string,
-    name: '',
+interface IPlayer extends IGamePlayer {
     deck: Array<ICard>,
+    inLobby: number | null,
 }
 
 interface ILobby {
@@ -27,6 +27,7 @@ interface ILobby {
     players: Array<IGamePlayer>,
     playerLimit: number,
     stack: Array<ICard>,
+    state: 'waiting' | 'playing' | 'finished',
 }
 
 type GameState = 'waiting' | 'playing' | 'finished';

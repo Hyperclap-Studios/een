@@ -6,7 +6,10 @@ import './Card.scss';
 interface ICardProps {
     color: CardColor;
     value: CardValue;
+    size?: CardSize;
 }
+
+type CardSize = 'small' | 'medium' | 'large';
 
 const cardSegments = <>
     <div className={'card_segment tl'}/>
@@ -15,7 +18,7 @@ const cardSegments = <>
     <div className={'card_segment br'}/>
 </>;
 
-export default function Card({color, value}: ICardProps) {
+export default function Card({color, value, size = 'medium'}: ICardProps) {
     const getRenderedValue = () => {
         switch (value) {
             case 'reverse':
@@ -39,7 +42,7 @@ export default function Card({color, value}: ICardProps) {
     };
 
     return (
-        <div className={`card ${color}`}>
+        <div className={`card ${color} ${size}`}>
             {getRenderedValue()}
         </div>
     );

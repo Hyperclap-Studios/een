@@ -27,6 +27,18 @@
     }
   }
 
+  $sm: .75;
+  &.small {
+    width: $w-card * $sm;
+    height: $h-card * $sm;
+  }
+
+  $lg: 1.25;
+  &.large {
+    width: $w-card * $lg;
+    height: $h-card * $lg;
+  }
+
   &.blue {
     background-color: $c-blue;
   }

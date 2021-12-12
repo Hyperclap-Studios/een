@@ -5,10 +5,16 @@ import {sign, verify} from 'jsonwebtoken';
 class Player {
     public name: string;
     public uuid: string;
+    public inLobby: number | null;
+    public lastPing: number;
+    public socketId: string;
 
     constructor(name: string) {
         this.name = name;
         this.uuid = generateUUID();
+        this.inLobby = null;
+        this.lastPing = Date.now();
+        this.socketId = '';
     }
 
     public getJWT(): string {
@@ -50,6 +56,10 @@ class Players {
         return player;
     }
 
+    public existsPlayer(uuid: string): boolean {
+        return this.getPlayer(uuid) !== null;
+    }
+
     public removePlayer(uuid: string): boolean {
         const player = this.getPlayer(uuid);
         if (player) {
@@ -67,6 +77,14 @@ class Players {
             }
         }
         return null;
+    }
+
+    public checkLifecycles(): void {
+        this.players.forEach(player => {
+            if (player.lastPing + 35 * 1000 < Date.now()) {
+                this.removePlayer(player.uuid);
+            }
+        });
     }
 
 }

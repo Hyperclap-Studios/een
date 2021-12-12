@@ -7,6 +7,11 @@ const tokenState = atom<string | null>({
     default: localStorage.getItem('token'),
 });
 
+const lobbyTokenState = atom<string>({
+    key: 'lobbyTokenState',
+    default: localStorage.getItem('lobbyToken') || '',
+});
+
 const socketState = atom<Socket | null>({
   key: 'socketState',
   default: null,
@@ -26,18 +31,25 @@ const modalState = atom<IModalState>({
     },
 });
 
-const lobbiesState = atom<Array<ILobby>>({
+const lobbiesState = atom<Array<ILobby> | null>({
     key: 'lobbiesState',
-    default: new Array<ILobby>(),
+    default: null,
+});
+
+const currentLobbyState = atom<number | null>({
+    key: 'currentLobbyState',
+    default: null,
 });
 
 const playerState = atom<IPlayer>({
     key: 'playerState',
     default: {
-        uuid: '',
         name: '',
         deck: new Array<ICard>(),
+        hasTurn: false,
+        inLobby: null,
+        isReady: false,
     },
 });
 
-export {tokenState, socketState, playerState, lobbiesState, modalState, screenState};
+export {tokenState, lobbyTokenState, socketState, currentLobbyState, playerState, lobbiesState, modalState, screenState};
