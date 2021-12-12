@@ -156,7 +156,7 @@ class Game {
     public nextTurn(offset = 1): GamePlayer | null {
         if (this.checkIsFinished()) return null;
         const nextIndex = (this.lastIndex + this.direction * offset);
-        const _nextIndex = (nextIndex <= 0 ? this.playingPlayers.length + nextIndex : nextIndex) % this.players.length;
+        const _nextIndex = offset === 0 ? this.lastIndex : (nextIndex <= 0 ? this.playingPlayers.length + nextIndex : nextIndex) % this.players.length;
         const nextPlayer = this.playingPlayers[_nextIndex];
         console.log(`LAST INDEX: ${this.lastIndex} - NEXT INDEX: ${_nextIndex}`);
         this.playingPlayers[this.lastIndex].hasTurn = false;
