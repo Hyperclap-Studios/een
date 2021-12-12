@@ -25,6 +25,7 @@ class GamePlayer {
     public ready: boolean;
     public place: number | null;
     public pickedUpCard: boolean;
+    public lastCardPlayed: number | false;
 
     constructor(player: Player) {
         this.player = player;
@@ -34,7 +35,13 @@ class GamePlayer {
         this.ready = false;
         this.place = null;
         this.pickedUpCard = false;
+        this.lastCardPlayed = false;
     }
+
+    public hasToPickUpCard(): boolean {
+        return (this.lastCardPlayed !== false && Date.now() - this.lastCardPlayed > 1000 * 3 && this.deck.length === 1);
+    }
+
 
     public reset() {
         this.deck = new Array<Card>();
@@ -71,6 +78,7 @@ class GamePlayer {
 
 class Game {
     public players: Array<GamePlayer>;
+    private playingPlayers: Array<GamePlayer>;
     public state: GameState;
     public stack: Array<Card>;
     public reserve: Array<Card>;
@@ -87,6 +95,7 @@ class Game {
             ...config,
         };
         this.players = new Array<GamePlayer>()
+        this.playingPlayers = new Array<GamePlayer>()
         this.state = 'waiting';
         this.stack = [Game.getRandomCard(false)];
         this.reserve = Game.getReserve(100);
@@ -118,6 +127,14 @@ class Game {
         const player = this.players.find(p => p.player.uuid === uuid);
         if (player) {
             this.players.splice(this.players.indexOf(player), 1);
+            if (this.state === 'playing') {
+                const playerIndex = this.playingPlayers.indexOf(player);
+                this.playingPlayers.splice(playerIndex, 1);
+                if (player.hasTurn) {
+                    this.lastIndex = this.direction === 1 ? (playerIndex >= this.playingPlayers.length ? 0 : playerIndex) : (playerIndex - 1 < 0 ? this.playingPlayers.length - 1 : playerIndex - 1);
+                    this.nextTurn(0);
+                }
+            }
             return true;
         }
         return false;
@@ -138,11 +155,11 @@ class Game {
     public nextTurn(offset = 1): GamePlayer | null {
         if (this.checkIsFinished()) return null;
         const nextIndex = (this.lastIndex + this.direction * offset);
-        const _nextIndex = (nextIndex <= 0 ? this.players.length + nextIndex : nextIndex) % this.players.length;
-        const nextPlayer = this.players[_nextIndex];
+        const _nextIndex = (nextIndex <= 0 ? this.playingPlayers.length + nextIndex : nextIndex) % this.players.length;
+        const nextPlayer = this.playingPlayers[_nextIndex];
         console.log(`LAST INDEX: ${this.lastIndex} - NEXT INDEX: ${_nextIndex}`);
-        this.players[this.lastIndex].hasTurn = false;
-        this.players[this.lastIndex].pickedUpCard = false;
+        this.playingPlayers[this.lastIndex].hasTurn = false;
+        //this.playingPlayers[this.lastIndex].pickedUpCard = false;
         nextPlayer.hasTurn = true;
         this.lastIndex = _nextIndex;
         if (nextPlayer.deck.length === 0) return this.nextTurn();
@@ -152,6 +169,7 @@ class Game {
         if (!this.canPlay(nextPlayer.player.uuid)) {
             const reserveCard = Game.getRandomCard(true);
             nextPlayer.deck.push(reserveCard);
+            nextPlayer.lastCardPlayed = false;
             nextPlayer.sortDeck();
             if (!reserveCard.canFollow(this.stack[this.stack.length - 1])) {
                 return this.nextTurn();
@@ -175,7 +193,7 @@ class Game {
             console.log(this.stack[this.stack.length - 1]);
             if (card.canFollow(this.stack[this.stack.length - 1])) {
                 if (card.color === 'black') card.color = chooseColor;
-                const offset = card.value === 'skip' ? (this.players.length <= 2 ? 0 : 2) : 1;
+                let offset = card.value === 'skip' ? (this.players.length <= 2 ? 0 : 2) : 1;
                 this.streak += card.value === '+2' ? 2 : card.value === '+4' ? 4 : 0;
                 console.log(`--- STREAK - ${this.streak}`);
                 if (card.value === 'reverse') this.direction *= -1;
@@ -186,8 +204,15 @@ class Game {
                     player.sortDeck();
                 }
                 if (player.deck.length === 0) {
+                    const playerIndex = this.playingPlayers.indexOf(player);
+                    this.playingPlayers.splice(playerIndex, 1);
+                    this.lastIndex = this.direction === 1 ? (playerIndex >= this.playingPlayers.length ? 0 : playerIndex) : (playerIndex - 1 < 0 ? this.playingPlayers.length - 1 : playerIndex - 1);
+                    console.log(this.lastIndex);
+                    offset = 0;
                     player.place = this.places;
                     this.places++;
+                } else if (player.deck.length === 1) {
+                    player.lastCardPlayed = Date.now();
                 }
                 const nextPlayer = this.nextTurn(offset);
                 if (!nextPlayer) {
@@ -199,6 +224,15 @@ class Game {
             }
         }
         return false;
+    }
+
+    public checkEen(): void {
+        this.players.forEach(player => {
+            if(player.hasToPickUpCard()) {
+                player.deck.push(Game.getRandomCard(true));
+                player.lastCardPlayed = false;
+            }
+        });
     }
 
     public trySkip(player: GamePlayer): boolean {
@@ -221,6 +255,7 @@ class Game {
         this.streak = 0;
         player.deck = [...player.deck, ...cards];
         player.sortDeck();
+        player.lastCardPlayed = false;
     }
 
     public canContinueStreak(player: GamePlayer) {
@@ -286,6 +321,7 @@ class Game {
             });
             this.lastIndex = Math.floor(Math.random() * this.players.length);
             this.players[this.lastIndex].hasTurn = true;
+            this.playingPlayers = [...this.players];
             if (!this.canPlay(this.players[this.lastIndex].player.uuid)) {
                 this.nextTurn(0);
             }

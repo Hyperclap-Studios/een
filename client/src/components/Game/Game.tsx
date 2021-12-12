@@ -29,6 +29,14 @@ export default function Game({lobby}: IGameProps) {
             socket.emit('update_player', {
                 lobbyId: lobby.id,
             });
+
+            window.addEventListener('keypress', (e) => {
+                if (e.key === ' ') {
+                    socket.emit('say_een', {
+                        lobbyId: lobby.id,
+                    });
+                }
+            });
         }
     }, []);
 

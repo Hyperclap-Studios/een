@@ -12,7 +12,7 @@ import { GamePlayer } from './classes/Game';
 
 config(); // Init Environment Variables from .env file
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8123;
 
 const app = express();
 app.use(cors());
@@ -156,6 +156,14 @@ io.on('connection', (socket: Socket) => {
         }
     });
 
+    socket.on('say_een', (payload) => {
+        const lobby = lobbies.getLobbyById(payload.lobbyId);
+        const player = lobby?.getPlayer(socket.data.uuid);
+        if (lobby && player) {
+            player.lastCardPlayed = false;
+        }
+    });
+
     refreshLobbies();
 })
 
@@ -248,7 +256,9 @@ setInterval(() => {
                 lobbyId: lobby.id,
             });
         });
+        lobby.checkEen();
         lobby.checkPlayerLifecycles();
+        refreshPlayers(lobby);
     });
 
     io.emit('player_ping', {
