@@ -128,9 +128,10 @@ class Game {
         if (player) {
             this.players.splice(this.players.indexOf(player), 1);
             if (this.state === 'playing') {
+                const hadTurn = player.hasTurn;
                 const playerIndex = this.playingPlayers.indexOf(player);
                 this.playingPlayers.splice(playerIndex, 1);
-                if (player.hasTurn) {
+                if (hadTurn) {
                     this.lastIndex = this.direction === 1 ? (playerIndex >= this.playingPlayers.length ? 0 : playerIndex) : (playerIndex - 1 < 0 ? this.playingPlayers.length - 1 : playerIndex - 1);
                     this.nextTurn(0);
                 }
